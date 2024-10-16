@@ -21,4 +21,3 @@ async function getUser() {
   console.log(user);
 }
 
-

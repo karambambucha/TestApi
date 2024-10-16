@@ -31,7 +31,7 @@ model Schedule {
   time_from  DateTime
   time_to    DateTime
   is_free    Boolean
-  patient    Patient  @relation(fields: [patient_id], references: [id], onDelete: Cascade)
-  patient_id Int
-  type       Int
+  patient    Patient?  @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  patient_id Int?
+  type       Int?
 }
