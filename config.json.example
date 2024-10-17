@@ -1,0 +1,5 @@
+{
+    "startHour": "number",
+    "endHour": "number",
+    "duration": "number"
+}

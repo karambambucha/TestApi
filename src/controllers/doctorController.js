@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const config = require('../../config.json');
 
 class doctorController {
   async getAppointments(req, res, next) {
@@ -8,20 +9,22 @@ class doctorController {
       const body = req.body;
       //генерация расписания
       let appointments = [];
-      const startHour = 8;
-      const endHour = 20;
-      const duration = 30;
-      const time = body.date.split("-");
+
+      const startHour = config.startHour;
+      const endHour = config.endHour;
+      const duration = config.duration;
+
+      const [year, month, day] = body.date.split("-");
 
       for (let hour = startHour; hour < endHour; hour++) {
         for (let minutes = 0; minutes < 60; minutes += duration) {
           const startTime = new Date(
-            Date.UTC(time[0], time[1] - 1, time[2], hour, minutes, 0, 0)
+            Date.UTC(year,month - 1,day, hour, minutes)
           );
 
           //time[1]-1 потому что почему-то выводится на месяц больше: time[1]=10 => startTime.month = 11
-          const endTime = new Date(startTime);
-          endTime.setMinutes(startTime.getMinutes() + duration);
+          const endTime = new Date(startTime.getTime() + duration * 60000);
+
 
           appointments.push({
             time_from: startTime,
@@ -29,6 +32,7 @@ class doctorController {
           });
         }
       }
+      
       //получение занятых слотов
       const busyAppoinments = await prisma.schedule.findMany({
         select: {
@@ -48,10 +52,14 @@ class doctorController {
 
       //поиск и удаление пересечении занятых временных слотах во всех слотах
 
-      const s = new Set(busyAppoinments.map((e) => JSON.stringify(e)));
-      const freeAppoinments = appointments.filter(
-        (e) => !s.has(JSON.stringify(e))
+      const busySet = new Set(
+        busyAppoinments.map(e => e.time_from.getTime() + "-" + e.time_to.getTime())
       );
+
+      const freeAppoinments = appointments.filter(
+        e => !busySet.has(e.time_from.getTime() + "-" + e.time_to.getTime())
+      );
+      
 
       res.json(freeAppoinments);
     } catch (err) {
