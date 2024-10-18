@@ -9,7 +9,7 @@ router.post("/patient", usersController.registerPatient);
 router.get("/patient/:phone", usersController.getPatientByPhone)
 router.post("/appointment", scheduleController.addAppointment)
 router.get("/appointments", doctorController.getAppointments)
-
+router.get("/doctor/:name", doctorController.getDoctor)
 function ping(req, res) {
   console.log("Starting command ping");
   res.send({

@@ -3,6 +3,25 @@ const prisma = new PrismaClient();
 const config = require('../../config.json');
 
 class doctorController {
+  async getDoctor (req, res, next)
+  {
+    try {
+      if (!req) return res.sendStatus(400);
+      console.log(req.params.name)
+      const doctor = await prisma.doctor.findFirst({
+        where: {
+          name: {
+            equals: req.params.name
+          }
+        }
+      })
+      
+      res.json(doctor);
+    } catch (err) {
+      console.log(err);
+      res.json(err);
+    }
+  }
   async getAppointments(req, res, next) {
     try {
       if (!req) return res.sendStatus(400);
