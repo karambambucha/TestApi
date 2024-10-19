@@ -75,23 +75,35 @@ class doctorController {
         )
       );
 
-      const freeAppoinments = appointments.filter(
-        (e) => !busySet.has(e.time_from.getTime() + "-" + e.time_to.getTime())
-      );
+      const freeAppoinments = appointments
+        .filter(
+          (e) => !busySet.has(e.time_from.getTime() + "-" + e.time_to.getTime())
+        )
+        .map((x) => ({
+          time_from: x.time_from.toUTCString(),
+          time_to: x.time_to.toUTCString(),
+        }));
+
       let time_start = freeAppoinments[0].time_from;
       let time_end = freeAppoinments[0].time_to;
+      let intervals = [];
 
       for (let i = 1; i < freeAppoinments.length; i++) {
-        if (freeAppoinments[i].time_from == time_end)
+        if (freeAppoinments[i].time_from == time_end) {
           time_end = freeAppoinments[i].time_to;
-        else 
-        {
-          time_start = freeAppoinments[i].time_from
-          time_end = freeAppoinments[i].time_end
-        };
+        } else {
+          if (intervals.length < 3)
+            intervals.push({ start: time_start, end: time_end });
+
+          time_start = freeAppoinments[i].time_from;
+          time_end = freeAppoinments[i].time_to;
+        }
       }
-      console.log(time_start, time_end);
-      res.json(freeAppoinments);
+      if (intervals.length < 3)
+        intervals.push({ start: time_start, end: time_end });
+      console.log(intervals);
+
+      res.json(intervals);
     } catch (err) {
       console.log(err);
       res.json(err);
