@@ -80,8 +80,8 @@ class doctorController {
           (e) => !busySet.has(e.time_from.getTime() + "-" + e.time_to.getTime())
         )
         .map((x) => ({
-          time_from: x.time_from.toUTCString(),
-          time_to: x.time_to.toUTCString(),
+          time_from: x.time_from.toISOString(),
+          time_to: x.time_to.toISOString(),
         }));
 
       let time_start = freeAppoinments[0].time_from;
