@@ -8,6 +8,7 @@ router.get("/ping", ping);
 router.post("/patient", usersController.registerPatient);
 router.get("/patient/:phone", usersController.getPatientByPhone)
 router.post("/appointment", scheduleController.addAppointment)
+router.post("/appointment/mark_notified", scheduleController.markNotified)
 router.get("/appointments", doctorController.getAppointments)
 router.get("/doctor/:name", doctorController.getDoctor)
 function ping(req, res) {

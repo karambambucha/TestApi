@@ -84,26 +84,7 @@ class doctorController {
           time_to: x.time_to.toISOString(),
         }));
 
-      let time_start = freeAppoinments[0].time_from;
-      let time_end = freeAppoinments[0].time_to;
-      let intervals = [];
-
-      for (let i = 1; i < freeAppoinments.length; i++) {
-        if (freeAppoinments[i].time_from == time_end) {
-          time_end = freeAppoinments[i].time_to;
-        } else {
-          if (intervals.length < 3)
-            intervals.push({ start: time_start, end: time_end });
-
-          time_start = freeAppoinments[i].time_from;
-          time_end = freeAppoinments[i].time_to;
-        }
-      }
-      if (intervals.length < 3)
-        intervals.push({ start: time_start, end: time_end });
-      console.log(intervals);
-
-      res.json(intervals);
+      res.json(freeAppoinments);
     } catch (err) {
       console.log(err);
       res.json(err);

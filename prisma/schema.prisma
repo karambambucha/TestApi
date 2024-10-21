@@ -11,7 +11,7 @@ model Patient {
   id       Int        @id @default(autoincrement())
   phone    String
   name     String?
-  email    String?     @unique
+  email    String?    @unique
   gender   String
   Schedule Schedule[]
 }
@@ -25,13 +25,32 @@ model Doctor {
 }
 
 model Schedule {
-  id         Int      @id @default(autoincrement())
-  doctor     Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
-  doctor_id  Int
-  time_from  DateTime
-  time_to    DateTime
-  is_free    Boolean
-  patient    Patient?  @relation(fields: [patient_id], references: [id], onDelete: Cascade)
-  patient_id Int?
-  type       Int?
+  id          Int      @id @default(autoincrement())
+  doctor      Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  doctor_id   Int
+  time_from   DateTime
+  time_to     DateTime
+  is_free     Boolean
+  patient     Patient? @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  patient_id  Int?
+  type        Int?
+  Calls       Calls[]
+}
+
+model CallType {
+  id                Int     @id @default(autoincrement())
+  name              String
+  hours_before_call Int
+  Calls             Calls[]
+}
+
+model Calls {
+  id          Int      @id @default(autoincrement())
+  calltask_id Int
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+  schedule_id Int
+  calltype    CallType @relation(fields: [calltype_id], references: [id], onDelete: Cascade)
+  calltype_id Int
+  call_result Json?
+  call_status String?
 }
