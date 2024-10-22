@@ -25,32 +25,56 @@ model Doctor {
 }
 
 model Schedule {
-  id          Int      @id @default(autoincrement())
-  doctor      Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
-  doctor_id   Int
-  time_from   DateTime
-  time_to     DateTime
-  is_free     Boolean
-  patient     Patient? @relation(fields: [patient_id], references: [id], onDelete: Cascade)
-  patient_id  Int?
-  type        Int?
-  Calls       Calls[]
+  id         Int      @id @default(autoincrement())
+  doctor     Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  doctor_id  Int
+  time_from  DateTime
+  time_to    DateTime
+  is_free    Boolean
+  patient    Patient? @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  patient_id Int?
+  type       Int?
+  Tasks      Tasks[]
 }
 
 model CallType {
   id                Int     @id @default(autoincrement())
   name              String
   hours_before_call Int
-  Calls             Calls[]
+  Tasks             Tasks[]
 }
 
 model Calls {
   id          Int      @id @default(autoincrement())
-  calltask_id Int
-  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
-  schedule_id Int
-  calltype    CallType @relation(fields: [calltype_id], references: [id], onDelete: Cascade)
-  calltype_id Int
+  task        Tasks    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  task_id     Int
+  calltask_id Int      @unique
   call_result Json?
   call_status String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Status {
+  id        Int      @id @default(autoincrement())
+  type      Int      @unique
+  name      String
+  Tasks     Tasks[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tasks {
+  id          Int      @id @default(autoincrement())
+  status      Status   @relation(fields: [status_id], references: [id], onDelete: Cascade)
+  status_id   Int
+  phone       String
+  info        Json
+  calltype    CallType @relation(fields: [calltype_id], references: [id], onDelete: Cascade)
+  calltype_id Int
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+  schedule_id Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Calls       Calls[]
 }

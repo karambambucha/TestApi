@@ -1,8 +1,8 @@
 const express = require("express");
-const cron = require('node-cron');
+const cron = require("node-cron");
 const bodyParser = require("body-parser");
 const router = require("./routes/routes.js");
-const caller = require("./caller/caller.js");
+const reminderService = require("./caller/reminderService.js");
 const app = express();
 const port = 3000;
 
@@ -19,7 +19,8 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-cron.schedule('* * * * *', () => {
-  //caller.call()
-
+cron.schedule("* * * * *", () => {
+  reminderService.collectAppointments();
+  reminderService.caller();
+  reminderService.watchdog();
 });
