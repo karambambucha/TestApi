@@ -4,28 +4,61 @@ const config = require("./config.json");
 const axios = require("axios");
 const { schedule } = require("node-cron");
 
-async function getAppointmentsIn24Hours() {
+async function getAppointments(hours) {
+  // универсальный (параметр 24/2/?? часа), забирает данные, по которым звонков ещё не было по данному типу
+
+  //получение calltypes, обр. сортировка по часам 
+  const callTypes = await prisma.callType.findMany({});
+  callTypes.sort((a, b) => b.hours_before_call - a.hours_before_call);
+  console.log(callTypes);
+
+  //находится индекс текущего calltype
+  let callTypeIndex = callTypes.findIndex((o) => o.hours_before_call === hours);
+
+  //находится следующий calltype
+  let nextCallType = callTypes[callTypeIndex + 1];
+
   let currentDate = new Date();
   currentDate.setHours(currentDate.getHours() + 7);
-
+  
   let nextDate = new Date(currentDate);
-  nextDate.setDate(nextDate.getDate() + 1);
+  nextDate.setHours(nextDate.getHours() + hours);
+
+  //если есть следующий calltype, убираем его из диапазона (допустим сейчас 24 часа, тогда убираются звонки, которые попадаются за 2 часа до приема)
+  
+  if (nextCallType)
+    currentDate.setHours(
+      currentDate.getHours() + nextCallType.hours_before_call
+    );
+
+  console.log("getAppointments: Время с ", currentDate, nextDate);
 
   const appointmentsToCall = await prisma.schedule.findMany({
     where: {
-      is_notified: false,
       time_from: {
+        gte: currentDate,
         lte: nextDate,
+      },
+      Calls: {
+        every: {
+          calltype_id: {
+            not: callTypes[callTypeIndex].id,
+          },
+        },
       },
     },
     include: {
       patient: true,
       doctor: true,
+      Calls: true,
     },
   });
 
-  console.log(appointmentsToCall);
+  console.log("getAppointments: Куда звонить:", appointmentsToCall);
+  return appointmentsToCall;
+}
 
+async function callClients(appointmentsToCall) {
   if (appointmentsToCall.length > 0) {
     let callData = [];
 
@@ -42,7 +75,7 @@ async function getAppointmentsIn24Hours() {
             .join(":"),
           doctor_name: item.doctor.name,
           calling_in: "24 часа",
-          schedule_id: item.id
+          schedule_id: item.id,
         }),
       });
     }
@@ -52,7 +85,7 @@ async function getAppointmentsIn24Hours() {
       project_id: config.projectId,
       data: JSON.stringify(callData),
     };
-    console.log(data);
+    console.log("Данные для апи мии:", data);
     let configuration = {
       method: "post",
       maxBodyLength: Infinity,
@@ -69,6 +102,7 @@ async function getAppointmentsIn24Hours() {
     //   .request(configuration)
     //   .then((response) => {
     //     console.log(JSON.stringify(response.data));
+    //      response.data.
     //   })
     //   .catch((error) => {
     //     console.log(error);
@@ -76,4 +110,6 @@ async function getAppointmentsIn24Hours() {
   }
 }
 
-getAppointmentsIn24Hours();
+//getAppointmentsIn24Hours();
+
+getAppointments(2);

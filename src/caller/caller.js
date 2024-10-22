@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const axios = require("axios");
 const { schedule } = require("node-cron");
 
-async function getAppointments(hours) { //todo универсальный (параметр 24/2 часа)
+async function getAppointments(hours) { // универсальный (параметр 24/2 часа)
   let currentDate = new Date();
   currentDate.setHours(currentDate.getHours() + 7);
 
