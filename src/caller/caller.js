@@ -13,8 +13,8 @@ async function getAppointments(hours) { //todo универсальный (па�
 
   const appointmentsToCall = await prisma.schedule.findMany({
     where: {
-      is_notified: false,
       time_from: {
+        gte: currentDate,
         lte: nextDate,
       },
     },
