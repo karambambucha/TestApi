@@ -250,3 +250,13 @@ async function watchdog() {
 //collectAppointments(24);
 //caller();
 //watchdog();
+let currentDate = new Date();
+currentDate.setHours(currentDate.getHours() + 7);
+let time_from = new Date("2024-10-24T08:00:00.000Z");
+const time_start =
+  (currentDate.toISOString().split("T")[0] === time_from.toISOString().split("T")[0]
+    ? "сегодня "
+    : "завтра ") +
+  time_from.toISOString().split("T")[1].split(":").slice(0, 2).join(":");
+
+console.log(time_start)

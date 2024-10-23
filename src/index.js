@@ -19,8 +19,9 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-cron.schedule("* * * * *", () => {
-  reminderService.collectAppointments();
-  reminderService.caller();
-  reminderService.watchdog();
+cron.schedule("* * * * *", async () => {
+  await reminderService.collectAppointments(24);
+  await reminderService.collectAppointments(2);
+  await reminderService.caller();
+  await reminderService.watchdog();
 });
